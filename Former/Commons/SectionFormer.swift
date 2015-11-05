@@ -12,6 +12,10 @@ public final class SectionFormer {
     
     // MARK: Public
     
+    public init(headerViewFormer viewFormer: ViewFormer?){
+        self.headerViewFormer = viewFormer
+    }
+    
     public init(rowFormer: RowFormer...) {
         self.rowFormers = rowFormer
     }
