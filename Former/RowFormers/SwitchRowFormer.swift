@@ -19,6 +19,7 @@ public final class SwitchRowFormer<T: UITableViewCell where T: SwitchFormableRow
     
     // MARK: Public
     
+    public var text:String?
     public var switched = false
     public var switchWhenSelected = false
     public var titleDisabledColor: UIColor? = .lightGrayColor()
@@ -53,6 +54,7 @@ public final class SwitchRowFormer<T: UITableViewCell where T: SwitchFormableRow
         }
         
         let titleLabel = cell.formTitleLabel()
+        titleLabel?.text = text
         let switchButton = cell.formSwitch()
         switchButton.on = switched
         switchButton.enabled = enabled
