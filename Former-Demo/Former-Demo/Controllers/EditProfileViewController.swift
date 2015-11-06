@@ -21,8 +21,8 @@ final class EditProfileViewController: FormViewController {
     // MARK: Private
     
     private lazy var imageRow: LabelRowFormer<ProfileImageCell> = {
-        LabelRowFormer<ProfileImageCell>(instantiateType: .Nib(nibName: "ProfileImageCell", bundle: nil)) {
-            $0.iconView.image = ProfileData.sharedInstance.image
+        LabelRowFormer<ProfileImageCell>(instantiateType: .Nib(nibName: "ProfileImageCell")) {
+            $0.iconView.image = Profile.sharedInstance.image
             }.configure {
                 $0.text = "Choose profile image from library"
                 $0.rowHeight = 60
@@ -37,53 +37,61 @@ final class EditProfileViewController: FormViewController {
         
         // Create RowFomers
         
-        let nameRow = TextFieldRowFormer<ProfileFieldCell>(instantiateType: .Nib(nibName: "ProfileFieldCell", bundle: nil)) {
+        let nameRow = TextFieldRowFormer<ProfileFieldCell>(instantiateType: .Nib(nibName: "ProfileFieldCell")) {
             $0.titleLabel.text = "Name"
             }.configure {
                 $0.placeholder = "Add your name"
-                $0.text = ProfileData.sharedInstance.name
+                $0.text = Profile.sharedInstance.name
             }.onTextChanged {
-                ProfileData.sharedInstance.name = $0
+                Profile.sharedInstance.name = $0
         }
-        let genderRow = InlinePickerRowFormer<ProfileLabelCell, String>(instantiateType: .Nib(nibName: "ProfileLabelCell", bundle: nil)) {
+        let genderRow = InlinePickerRowFormer<ProfileLabelCell, String>(instantiateType: .Nib(nibName: "ProfileLabelCell")) {
             $0.titleLabel.text = "Gender"
             }.configure {
                 let genders = ["Male", "Female"]
                 $0.pickerItems = genders.map {
                     InlinePickerItem<String>(title: $0)
                 }
-                if let gender = ProfileData.sharedInstance.gender {
+                if let gender = Profile.sharedInstance.gender {
                     $0.selectedRow = genders.indexOf(gender) ?? 0
                 }
             }.onValueChanged {
-                ProfileData.sharedInstance.gender = $0.title
+                Profile.sharedInstance.gender = $0.title
         }
-        let birthdayRow = InlineDatePickerRowFormer<ProfileLabelCell>(instantiateType: .Nib(nibName: "ProfileLabelCell", bundle: nil)) {
+        let birthdayRow = InlineDatePickerRowFormer<ProfileLabelCell>(instantiateType: .Nib(nibName: "ProfileLabelCell")) {
             $0.titleLabel.text = "Birthday"
             }.configure {
-                $0.date = ProfileData.sharedInstance.birthDay ?? NSDate()
+                $0.date = Profile.sharedInstance.birthDay ?? NSDate()
             }.inlineCellSetup {
                 $0.datePicker.datePickerMode = .Date
             }.displayTextFromDate {
                 return String.mediumDateNoTime($0)
             }.onDateChanged {
-                ProfileData.sharedInstance.birthDay = $0
+                Profile.sharedInstance.birthDay = $0
         }
-        let locationRow = TextFieldRowFormer<ProfileFieldCell>(instantiateType: .Nib(nibName: "ProfileFieldCell", bundle: nil)) {
+        let locationRow = TextFieldRowFormer<ProfileFieldCell>(instantiateType: .Nib(nibName: "ProfileFieldCell")) {
             $0.titleLabel.text = "Location"
             }.configure {
                 $0.placeholder = "Add your location"
-                $0.text = ProfileData.sharedInstance.location
+                $0.text = Profile.sharedInstance.location
             }.onTextChanged {
-                ProfileData.sharedInstance.location = $0
+                Profile.sharedInstance.location = $0
+        }
+        let introductionRow = TextViewRowFormer<FormTextViewCell>() {
+            $0.textView.textColor = .formerSubColor()
+            $0.textView.font = .systemFontOfSize(15)
+            }.configure {
+                $0.placeholder = "Add your self-introduction"
+                $0.text = Profile.sharedInstance.introduction
+            }.onTextChanged {
+                Profile.sharedInstance.introduction = $0
         }
         
         // Create Headers and Footers
         
         let createHeader: (String -> ViewFormer) = { text in
-            return LabelViewFormer<FormLabelHeaderView>() {
-                $0.titleLabel.textColor = .lightGrayColor()
-                }.configure {
+            return LabelViewFormer<FormLabelHeaderView>()
+                .configure {
                     $0.viewHeight = 44
                     $0.text = text
             }
@@ -95,8 +103,10 @@ final class EditProfileViewController: FormViewController {
             .set(headerViewFormer: createHeader("Profile Image"))
         let statusSection = SectionFormer(rowFormer: nameRow, genderRow, birthdayRow, locationRow)
             .set(headerViewFormer: createHeader("About"))
+        let introductionSection = SectionFormer(rowFormer: introductionRow)
+            .set(headerViewFormer: createHeader("Introduction"))
         
-        former.append(sectionFormer: imageSection, statusSection)
+        former.append(sectionFormer: imageSection, statusSection, introductionSection)
     }
     
     private func presentImagePicker() {
@@ -112,7 +122,7 @@ extension EditProfileViewController: UIImagePickerControllerDelegate, UINavigati
     
     func imagePickerController(picker: UIImagePickerController, didFinishPickingImage image: UIImage, editingInfo: [String : AnyObject]?) {
         picker.dismissViewControllerAnimated(true, completion: nil)
-        ProfileData.sharedInstance.image = image
+        Profile.sharedInstance.image = image
         imageRow.cellUpdate {
             $0.iconView.image = image
         }

@@ -10,15 +10,15 @@ import UIKit
 
 public protocol SelectorDatePickerFormableRow: FormableRow {
     
-    var selectorDatePicker: UIDatePicker? { get set } // Not need to set UIDatePicker instance.
-    var selectorAccessoryView: UIView? { get set } // Not need to set UIView instance.
+    var selectorDatePicker: UIDatePicker? { get set } // Needs NOT to set instance.
+    var selectorAccessoryView: UIView? { get set } // Needs NOT to set instance.
     
     func formTitleLabel() -> UILabel?
     func formDisplayLabel() -> UILabel?
 }
 
 public final class SelectorDatePickerRowFormer<T: UITableViewCell where T: SelectorDatePickerFormableRow>
-: CustomRowFormer<T>, UpdatableSelectorForm, ConfigurableForm {
+: BaseRowFormer<T>, Formable, UpdatableSelectorForm {
     
     // MARK: Public
     
@@ -76,7 +76,6 @@ public final class SelectorDatePickerRowFormer<T: UITableViewCell where T: Selec
     }
     
     public override func cellSelected(indexPath: NSIndexPath) {
-        super.cellSelected(indexPath)
         former?.deselect(true)
     }
     
