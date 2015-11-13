@@ -848,6 +848,7 @@ extension Former: UITableViewDelegate, UITableViewDataSource {
     }
     
     public func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        tableView.deselectRowAtIndexPath(indexPath, animated: false)
         let rowFormer = self.rowFormer(indexPath)
         guard rowFormer.enabled else { return }
         
