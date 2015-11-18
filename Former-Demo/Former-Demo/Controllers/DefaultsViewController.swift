@@ -1,5 +1,5 @@
 //
-//  DefaultRowFormerViewController.swift
+//  DefaultsViewController.swift
 //  Former-Demo
 //
 //  Created by Ryo Aoyama on 7/23/15.
@@ -9,7 +9,7 @@
 import UIKit
 import Former
 
-final class DefaultRowFormerViewController: FormViewController {
+final class DefaultsViewController: FormViewController {
     
     // MARK: Public
 
@@ -35,7 +35,7 @@ final class DefaultRowFormerViewController: FormViewController {
                 $0.text = disableRowText(false)
             }.onSelected(disableRowSelected)
         
-        let textRow = LabelRowFormer<FormLabelCell>()
+        let labelRow = LabelRowFormer<FormLabelCell>()
             .configure {
                 $0.text = "Text"
                 $0.subText = "SubText"
@@ -80,11 +80,11 @@ final class DefaultRowFormerViewController: FormViewController {
         let selectorPickerRow = SelectorPickerRowFormer<FormSelectorPickerCell, Any>() {
             $0.titleLabel.text = "SelectorPicker"
             }.configure {
-                $0.pickerItems = [SelectorPickerItem<Any>(
+                $0.pickerItems = [SelectorPickerItem(
                     title: "",
                     displayTitle: NSAttributedString(string: "Not Set"),
                     value: nil)]
-                    + (1...20).map { SelectorPickerItem<Any>(title: "Option\($0)") }
+                    + (1...20).map { SelectorPickerItem(title: "Option\($0)") }
         }
         
         let selectorDatePickerRow = SelectorDatePickerRowFormer<FormSelectorDatePickerCell> {
@@ -94,11 +94,11 @@ final class DefaultRowFormerViewController: FormViewController {
         let inlinePickerRow = InlinePickerRowFormer<FormInlinePickerCell, Any>() {
             $0.titleLabel.text = "InlinePicker"
             }.configure {
-                $0.pickerItems = [InlinePickerItem<Any>(
+                $0.pickerItems = [InlinePickerItem(
                     title: "",
                     displayTitle: NSAttributedString(string: "Not set"),
                     value: nil)]
-                    + (1...20).map { InlinePickerItem<Any>(title: "Option\($0)") }
+                    + (1...20).map { InlinePickerItem(title: "Option\($0)") }
         }
         
         let inlineDateRow = InlineDatePickerRowFormer<FormInlineDatePickerCell>() {
@@ -107,7 +107,7 @@ final class DefaultRowFormerViewController: FormViewController {
         
         let pickerRow = PickerRowFormer<FormPickerCell, Any>()
             .configure {
-                $0.pickerItems = (1...20).map { PickerItem<Any>(title: "Option\($0)") }
+                $0.pickerItems = (1...20).map { PickerItem(title: "Option\($0)") }
         }
         
         let datePickerRow = DatePickerRowFormer<FormDatePickerCell>()
@@ -117,7 +117,7 @@ final class DefaultRowFormerViewController: FormViewController {
         let sectionFormer1 = SectionFormer(rowFormer: disableRow)
         
         let sectionFormer2 = SectionFormer(rowFormer:
-            textRow, textFieldRow, textViewRow,
+            labelRow, textFieldRow, textViewRow,
             checkRow, switchRow, stepperRow,
             segmentRow, sliderRow, selectorPickerRow,
             selectorDatePickerRow, inlinePickerRow, inlineDateRow

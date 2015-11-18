@@ -35,10 +35,13 @@ final class ExampleViewController: FormViewController {
     }
     
     private func configure() {
-        title = "Usage Example"
+        title = "Examples"
+        tableView.contentInset.bottom = 30
         
         // Create RowFormers
         // Date Setting Example
+        
+        let inputAccessoryView = FormerInputAccessoryView(former: former)
         
         let dateRow = InlineDatePickerRowFormer<FormInlineDatePickerCell>() {
             $0.titleLabel.text = "Date"
@@ -67,6 +70,19 @@ final class ExampleViewController: FormViewController {
                 dateRow.update()
         }
         
+        // Custom Check Row Example
+        
+        let customCheckRow = CheckRowFormer<FormCheckCell>() {
+            $0.titleLabel.text = "Custom Check Icon"
+            $0.titleLabel.textColor = .formerColor()
+            $0.titleLabel.font = .boldSystemFontOfSize(16)
+            }.configure {
+                let check = UIImage(named: "check")!.imageWithRenderingMode(.AlwaysTemplate)
+                let checkView = UIImageView(image: check)
+                checkView.tintColor = .formerSubColor()
+                $0.customCheckView = checkView
+        }
+        
         // Insert Rows Example
         
         let positions = ["Below", "Above"]
@@ -88,7 +104,7 @@ final class ExampleViewController: FormViewController {
             $0.displayLabel.font = .boldSystemFontOfSize(14)
             }.configure {
                 $0.pickerItems = UITableViewRowAnimation.names().enumerate().map {
-                    InlinePickerItem<UITableViewRowAnimation>(title: $0.element, value: UITableViewRowAnimation.all()[$0.index])
+                    InlinePickerItem(title: $0.element, value: UITableViewRowAnimation.all()[$0.index])
                 }
                 $0.selectedRow = UITableViewRowAnimation.all().indexOf(insertRowAnimation) ?? 0
                 $0.displayEditingColor = .formerHighlightedSubColor()
@@ -129,7 +145,7 @@ final class ExampleViewController: FormViewController {
             $0.displayLabel.font = .boldSystemFontOfSize(14)
             }.configure {
                 $0.pickerItems = UITableViewRowAnimation.names().enumerate().map {
-                    InlinePickerItem<UITableViewRowAnimation>(title: $0.element, value: UITableViewRowAnimation.all()[$0.index])
+                    InlinePickerItem(title: $0.element, value: UITableViewRowAnimation.all()[$0.index])
                 }
                 $0.selectedRow = UITableViewRowAnimation.all().indexOf(insertSectionAnimation) ?? 0
                 $0.displayEditingColor = .formerHighlightedSubColor()
@@ -173,21 +189,21 @@ final class ExampleViewController: FormViewController {
                 $0.selectorViewUpdate {
                     $0.backgroundColor = .whiteColor()
                 }
-                $0.pickerItems = options.map { SelectorPickerItem<Any>(title: $0) }
-                $0.inputAccessoryView = formerInputAccessoryView
+                $0.pickerItems = options.map { SelectorPickerItem(title: $0) }
+                $0.inputAccessoryView = inputAccessoryView
                 $0.displayEditingColor = .formerHighlightedSubColor()
         }
         
         // Custom Input Accessory View Example
 
         let textFields = (1...2).map { index -> RowFormer in
-            return TextFieldRowFormer<FormTextFieldCell>() { [weak self] in
+            return TextFieldRowFormer<FormTextFieldCell>() {
                 $0.titleLabel.text = "Field\(index)"
                 $0.titleLabel.textColor = .formerColor()
                 $0.titleLabel.font = .boldSystemFontOfSize(16)
                 $0.textField.textColor = .formerSubColor()
                 $0.textField.font = .boldSystemFontOfSize(14)
-                $0.textField.inputAccessoryView = self?.formerInputAccessoryView
+                $0.textField.inputAccessoryView = inputAccessoryView
                 $0.textField.returnKeyType = .Next
                 $0.tintColor = .formerColor()
                 }.configure {
@@ -202,7 +218,7 @@ final class ExampleViewController: FormViewController {
             $0.displayLabel.textColor = .formerSubColor()
             $0.displayLabel.font = .boldSystemFontOfSize(14)
             }.configure {
-                $0.pickerItems = (1...20).map { InlinePickerItem<Any>(title: "Option\($0)") }
+                $0.pickerItems = (1...20).map { InlinePickerItem(title: "Option\($0)") }
                 $0.displayEditingColor = .formerHighlightedSubColor()
         }
         
@@ -220,23 +236,24 @@ final class ExampleViewController: FormViewController {
         
         let section1 = SectionFormer(rowFormer: switchDateStyleRow, dateRow)
             .set(headerViewFormer: createHeader("Date Setting Example"))
-        let section2 = SectionFormer(rowFormer: insertRowsRow, insertRowPositionRow, insertRowAnimationRow)
+        let section2 = SectionFormer(rowFormer: customCheckRow)
+            .set(headerViewFormer: createHeader("Custom Check Example"))
+        let section3 = SectionFormer(rowFormer: insertRowsRow, insertRowPositionRow, insertRowAnimationRow)
             .set(headerViewFormer: createHeader("Insert Rows Example"))
-        let section3 = SectionFormer(rowFormer: insertSectionRow, insertSectionPositionRow, insertSectionAnimationRow)
+        let section4 = SectionFormer(rowFormer: insertSectionRow, insertSectionPositionRow, insertSectionAnimationRow)
             .set(headerViewFormer: createHeader("Insert Section Example"))
-        let section4 = SectionFormer(rowFormer: pushSelectorRow, sheetSelectorRow, pickerSelectorRow)
+        let section5 = SectionFormer(rowFormer: pushSelectorRow, sheetSelectorRow, pickerSelectorRow)
             .set(headerViewFormer: createHeader("Selector Example"))
-        let section5 = SectionFormer(rowFormers: textFields + [inlinePickerRow])
+        let section6 = SectionFormer(rowFormers: textFields + [inlinePickerRow])
             .set(headerViewFormer: createHeader("Custom Input Accessory View Example"))
-            .set(footerViewFormer: CustomViewFormer<FormHeaderFooterView>())
         
-        insertRowsRow.onSwitchChanged(insertRows(sectionTop: section2.firstRowFormer!, sectionBottom: section2.lastRowFormer!))
-        insertSectionRow.onSwitchChanged(insertSection(relate: section3))
+        insertRowsRow.onSwitchChanged(insertRows(sectionTop: section3.firstRowFormer!, sectionBottom: section3.lastRowFormer!))
+        insertSectionRow.onSwitchChanged(insertSection(relate: section4))
         
         former.append(sectionFormer:
-            section1, section2, section3, section4, section5
-            ).onCellSelected { [weak self] _ in
-                self?.formerInputAccessoryView.update()
+            section1, section2, section3, section4, section5, section6
+            ).onCellSelected { _ in
+                inputAccessoryView.update()
         }
     }
     
@@ -271,10 +288,6 @@ final class ExampleViewController: FormViewController {
                 $0.tintColor = .formerSubColor()
             }
             ])
-        }()
-    
-    private lazy var formerInputAccessoryView: FormerInputAccessoryView = { [unowned self] in
-        FormerInputAccessoryView(former: self.former)
         }()
     
     private func insertRows(sectionTop sectionTop: RowFormer, sectionBottom: RowFormer)(insert: Bool) {

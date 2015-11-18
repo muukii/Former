@@ -30,7 +30,7 @@ public final class TextViewRowFormer<T: UITableViewCell where T: TextViewFormabl
     public var titleDisabledColor: UIColor? = .lightGrayColor()
     public var titleEditingColor: UIColor?
     
-    required public init(instantiateType: Former.InstantiateType = .Class, cellSetup: (T -> Void)? = nil) {
+    public required init(instantiateType: Former.InstantiateType = .Class, cellSetup: (T -> Void)? = nil) {
         super.init(instantiateType: instantiateType, cellSetup: cellSetup)
     }
     
@@ -82,7 +82,7 @@ public final class TextViewRowFormer<T: UITableViewCell where T: TextViewFormabl
                 ].flatMap { $0 }
             textView.addConstraints(constraints)
         }
-        _ = placeholder.map {placeholderLabel?.text  = $0 }
+        _ = placeholder.map { placeholderLabel?.text  = $0 }
         if let attributedPlaceholder = attributedPlaceholder {
             placeholderLabel?.text = nil
             placeholderLabel?.attributedText = attributedPlaceholder
@@ -91,7 +91,7 @@ public final class TextViewRowFormer<T: UITableViewCell where T: TextViewFormabl
         
         if enabled {
             if isEditing {
-                if titleColor == nil { titleColor = titleLabel?.textColor }
+                if titleColor == nil { titleColor = titleLabel?.textColor ?? .blackColor() }
                 _ = titleEditingColor.map { titleLabel?.textColor = $0 }
             } else {
                 _ = titleColor.map { titleLabel?.textColor = $0 }
@@ -100,8 +100,8 @@ public final class TextViewRowFormer<T: UITableViewCell where T: TextViewFormabl
             _ = textColor.map { textView.textColor = $0 }
             textColor = nil
         } else {
-            if titleColor == nil { titleColor = titleLabel?.textColor }
-            if textColor == nil { textColor = textView.textColor }
+            if titleColor == nil { titleColor = titleLabel?.textColor ?? .blackColor() }
+            if textColor == nil { textColor = textView.textColor ?? .blackColor() }
             titleLabel?.textColor = titleDisabledColor
             textView.textColor = textDisabledColor
         }
@@ -120,9 +120,7 @@ public final class TextViewRowFormer<T: UITableViewCell where T: TextViewFormabl
     private final var titleColor: UIColor?
     private final var _attributedString: NSAttributedString?
     private final weak var placeholderLabel: UILabel?
-    private final lazy var observer: Observer<T> = { [unowned self] in
-        Observer<T>(textViewRowFormer: self)
-        }()
+    private final lazy var observer: Observer<T> = Observer<T>(textViewRowFormer: self)
     
     private final func updatePlaceholderColor(text: String?) {
         if attributedPlaceholder == nil {
@@ -168,7 +166,7 @@ NSObject, UITextViewDelegate {
         if textViewRowFormer.enabled {
             let titleLabel = textViewRowFormer.cell.formTitleLabel()
             if textViewRowFormer.titleColor == nil {
-                textViewRowFormer.titleColor = titleLabel?.textColor
+                textViewRowFormer.titleColor = titleLabel?.textColor ?? .blackColor()
             }
             _ = textViewRowFormer.titleEditingColor.map { titleLabel?.textColor = $0 }
             textViewRowFormer.isEditing = true
@@ -185,7 +183,7 @@ NSObject, UITextViewDelegate {
             textViewRowFormer.titleColor = nil
         } else {
             if textViewRowFormer.titleColor == nil {
-                textViewRowFormer.titleColor = titleLabel?.textColor
+                textViewRowFormer.titleColor = titleLabel?.textColor ?? .blackColor()
             }
             titleLabel?.textColor = textViewRowFormer.titleDisabledColor
         }

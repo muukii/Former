@@ -19,9 +19,10 @@ public final class CheckRowFormer<T: UITableViewCell where T: CheckFormableRow>
     // MARK: Public
     
     public var checked = false
+    public var customCheckView: UIView?
     public var titleDisabledColor: UIColor? = .lightGrayColor()
     
-    required public init(instantiateType: Former.InstantiateType = .Class, cellSetup: (T -> Void)? = nil) {
+    public required init(instantiateType: Former.InstantiateType = .Class, cellSetup: (T -> Void)? = nil) {
         super.init(instantiateType: instantiateType, cellSetup: cellSetup)
     }
     
@@ -33,13 +34,18 @@ public final class CheckRowFormer<T: UITableViewCell where T: CheckFormableRow>
     public override func update() {
         super.update()
         
-        cell.accessoryType = checked ? .Checkmark : .None
+        if let customCheckView = customCheckView {
+            cell.accessoryView = customCheckView
+            customCheckView.hidden = checked ? false : true
+        } else {
+            cell.accessoryType = checked ? .Checkmark : .None
+        }
         let titleLabel = cell.formTitleLabel()
         if enabled {
             _ = titleColor.map { titleLabel?.textColor = $0 }
             titleColor = nil
         } else {
-            if titleColor == nil { titleColor = titleLabel?.textColor }
+            if titleColor == nil { titleColor = titleLabel?.textColor ?? .blackColor() }
             titleLabel?.textColor = titleDisabledColor
         }
     }
@@ -49,7 +55,12 @@ public final class CheckRowFormer<T: UITableViewCell where T: CheckFormableRow>
         if enabled {
             checked = !checked
             onCheckChanged?(checked)
-            cell.accessoryType = checked ? .Checkmark : .None
+            if let customCheckView = customCheckView {
+                cell.accessoryView = customCheckView
+                customCheckView.hidden = checked ? false : true
+            } else {
+                cell.accessoryType = checked ? .Checkmark : .None
+            }
         }
     }
     

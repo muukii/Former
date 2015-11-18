@@ -31,19 +31,8 @@ public final class TextFieldRowFormer<T: UITableViewCell where T: TextFieldForma
     public var titleEditingColor: UIColor?
     public var returnToNextRow = true
     
-    required public init(instantiateType: Former.InstantiateType = .Class, cellSetup: (T -> Void)? = nil) {
+    public required init(instantiateType: Former.InstantiateType = .Class, cellSetup: (T -> Void)? = nil) {
         super.init(instantiateType: instantiateType, cellSetup: cellSetup)
-    }
-    
-    deinit {
-        let textField = cell.formTextField()
-        textField.delegate = nil
-        let events: [(Selector, UIControlEvents)] = [("textChanged:", .EditingChanged),
-            ("editingDidBegin:", .EditingDidBegin),
-            ("editingDidEnd:", .EditingDidEnd)]
-        events.forEach {
-            textField.removeTarget(self, action: $0.0, forControlEvents: $0.1)
-        }
     }
     
     public final func onTextChanged(handler: (String -> Void)) -> Self {
@@ -76,7 +65,7 @@ public final class TextFieldRowFormer<T: UITableViewCell where T: TextFieldForma
         
         if enabled {
             if isEditing {
-                if titleColor == nil { titleColor = titleLabel?.textColor }
+                if titleColor == nil { titleColor = titleLabel?.textColor ?? .blackColor() }
                 _ = titleEditingColor.map { titleLabel?.textColor = $0 }
             } else {
                 _ = titleColor.map { titleLabel?.textColor = $0 }
@@ -85,8 +74,8 @@ public final class TextFieldRowFormer<T: UITableViewCell where T: TextFieldForma
             _ = textColor.map { textField.textColor = $0 }
             textColor = nil
         } else {
-            if titleColor == nil { titleColor = titleLabel?.textColor }
-            if textColor == nil { textColor = textField.textColor }
+            if titleColor == nil { titleColor = titleLabel?.textColor ?? .blackColor() }
+            if textColor == nil { textColor = textField.textColor ?? .blackColor() }
             titleLabel?.textColor = titleDisabledColor
             textField.textColor = textDisabledColor
         }
@@ -106,9 +95,7 @@ public final class TextFieldRowFormer<T: UITableViewCell where T: TextFieldForma
     private final var textColor: UIColor?
     private final var titleColor: UIColor?
     
-    private lazy var observer: Observer<T> = { [unowned self] in
-        Observer<T>(textFieldRowFormer: self)
-        }()
+    private lazy var observer: Observer<T> = Observer<T>(textFieldRowFormer: self)
     
     private dynamic func textChanged(textField: UITextField) {
         if enabled {
@@ -120,7 +107,7 @@ public final class TextFieldRowFormer<T: UITableViewCell where T: TextFieldForma
     
     private dynamic func editingDidBegin(textField: UITextField) {
         let titleLabel = cell.formTitleLabel()
-        if titleColor == nil { textColor = textField.textColor }
+        if titleColor == nil { textColor = textField.textColor ?? .blackColor() }
         _ = titleEditingColor.map { titleLabel?.textColor = $0 }
     }
     
@@ -130,7 +117,7 @@ public final class TextFieldRowFormer<T: UITableViewCell where T: TextFieldForma
             _ = titleColor.map { titleLabel?.textColor = $0 }
             titleColor = nil
         } else {
-            if titleColor == nil { titleColor = titleLabel?.textColor }
+            if titleColor == nil { titleColor = titleLabel?.textColor ?? .blackColor() }
             _ = titleEditingColor.map { titleLabel?.textColor = $0 }
         }
         cell.formTextField().userInteractionEnabled = false

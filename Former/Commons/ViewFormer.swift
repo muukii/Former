@@ -19,7 +19,7 @@ public class ViewFormer {
     
     public var viewHeight: CGFloat = 10
     
-    public init<T: UITableViewHeaderFooterView>(
+    internal init<T: UITableViewHeaderFooterView>(
         viewType: T.Type,
         instantiateType: Former.InstantiateType,
         viewSetup: (T -> Void)? = nil) {
@@ -59,7 +59,6 @@ public class ViewFormer {
                 view = bundle.loadNibNamed(nibName, owner: nil, options: nil).first as? UITableViewHeaderFooterView
                 assert(view != nil, "[Former] Failed to load header footer view from nib (nibName: \(nibName)), bundle: (\(bundle)).")
             }
-            view!.contentView.backgroundColor = .clearColor()
             _viewInstance = view
             viewInstanceInitialized(view!)
             viewSetup(view!)

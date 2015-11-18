@@ -26,9 +26,11 @@ final class TopViewContoller: FormViewController {
     // MARK: Private
     
     private func configure() {
+        let logo = UIImage(named: "header_logo")!
+        navigationItem.titleView = UIImageView(image: logo)
         let backBarButton = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         navigationItem.backBarButtonItem = backBarButton
-        title = "Former"
+        tableView.contentInset.top = 40
         
         // Create RowFormers
         
@@ -43,14 +45,24 @@ final class TopViewContoller: FormViewController {
                     onSelected?()
             }
         }
-        let realExampleRow = createMenu("Edit Profile") { [weak self] in
+        let editProfileRow = createMenu("Edit Profile") { [weak self] in
             self?.navigationController?.pushViewController(EditProfileViewController(), animated: true)
         }
-        let defaultExampleRow = createMenu("Default RowFormer Examples") { [weak self] in
+        let addEventRow = createMenu("Add Event") { [weak self] in
+            self?.navigationController?.pushViewController(AddEventViewController(), animated: true)
+        }
+        let loginRow = createMenu("Login") { [weak self] in
+            _ = self.map { LoginViewController.present($0) }
+            self?.former.deselect(true)
+        }
+        let exampleRow = createMenu("Examples") { [weak self] in
             self?.navigationController?.pushViewController(ExampleViewController(), animated: true)
         }
+        let customCellRow = createMenu("Custom Cell") { [weak self] in
+            self?.navigationController?.pushViewController(CustomCellViewController(), animated: true)
+        }
         let defaultRow = createMenu("All Defaults") { [weak self] in
-            self?.navigationController?.pushViewController(DefaultRowFormerViewController(), animated: true)
+            self?.navigationController?.pushViewController(DefaultsViewController(), animated: true)
         }
         
         // Create Headers and Footers
@@ -59,7 +71,7 @@ final class TopViewContoller: FormViewController {
             return LabelViewFormer<FormLabelHeaderView>()
                 .configure {
                     $0.text = text
-                    $0.viewHeight = 44
+                    $0.viewHeight = 40
             }
         }
         
@@ -73,16 +85,14 @@ final class TopViewContoller: FormViewController {
         
         // Create SectionFormers
         
-        let firstSection = SectionFormer(rowFormer: realExampleRow)
-            .set(headerViewFormer: createHeader("Real Example"))
-        
-        let secondSection = SectionFormer(rowFormer: defaultExampleRow)
-            .set(headerViewFormer: createHeader("Usage Examples"))
-        
-        let thirdSection = SectionFormer(rowFormer: defaultRow)
+        let realExampleSection = SectionFormer(rowFormer: editProfileRow, addEventRow, loginRow)
+            .set(headerViewFormer: createHeader("Real Examples"))
+        let useCaseSection = SectionFormer(rowFormer: exampleRow, customCellRow)
+            .set(headerViewFormer: createHeader("Use Case"))
+        let defaultSection = SectionFormer(rowFormer: defaultRow)
             .set(headerViewFormer: createHeader("Default UI"))
             .set(footerViewFormer: createFooter("Former is a fully customizable Swift2 library for easy creating UITableView based form.\n\nMIT License (MIT)"))
         
-        former.append(sectionFormer: firstSection, secondSection, thirdSection)
+        former.append(sectionFormer: realExampleSection, useCaseSection, defaultSection)
     }
 }
